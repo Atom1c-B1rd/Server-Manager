@@ -227,10 +227,10 @@ func normalizeScripts(cfg *ServerConfig) {
 		return
 	}
 	defaults := map[string][]string{
-		"http": {`sdk "server-manager/sdk"`, `"net/http"`},
-		"ws":   {`sdk "server-manager/sdk"`, `"github.com/gorilla/websocket"`},
-		"tcp":  {`sdk "server-manager/sdk"`, `"net"`},
-		"udp":  {`sdk "server-manager/sdk"`, `"net"`},
+		"http": {`sdk "server-manager/sdk"`, "os", `"net/http"`},
+		"ws":   {`sdk "server-manager/sdk"`, "os", `"github.com/gorilla/websocket"`},
+		"tcp":  {`sdk "server-manager/sdk"`, "os", `"net"`},
+		"udp":  {`sdk "server-manager/sdk"`, "os", `"net"`},
 	}
 	imports := map[string]bool{}
 	var importLines []string

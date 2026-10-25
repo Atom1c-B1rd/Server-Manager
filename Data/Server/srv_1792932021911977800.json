@@ -1,0 +1,32 @@
+{
+  "id": "srv_1792932021911977800",
+  "name": "Test",
+  "proto": "ws",
+  "port": 9000,
+  "status": "stopped",
+  "handlers": [
+    {
+      "id": "h_default",
+      "name": "HandleMessage",
+      "method": "",
+      "path": "*",
+      "code": "func HandleMessage(conn *websocket.Conn, msgType int, payload []byte) error {\n    return conn.WriteMessage(msgType, append([]byte(\"Echo: \"), payload...))\n}"
+    }
+  ],
+  "routes": [
+    {
+      "id": "r_default",
+      "path": "/"
+    }
+  ],
+  "message_type_field": "type",
+  "global_script": "package main\n\nimport (\n\t\"encoding/json\"\n\t\\n\t\"os\"\n\t\"fmt\"\n\t\"github.com/gorilla/websocket\"\n\tsdk \"server-manager/sdk\"\n)\n\n// SERVER_MANAGER_GLOBAL_DECLARATIONS",
+  "created_at": "2026-10-25T09:40:21-03:00",
+  "dependencies": [
+    {
+      "path": "github.com/gorilla/websocket",
+      "version": "v1.5.3",
+      "status": "installed"
+    }
+  ]
+}
