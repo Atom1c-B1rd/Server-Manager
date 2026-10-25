@@ -21,8 +21,6 @@ Aplicación local para crear, configurar y administrar servidores desde una inte
 
 Las dependencias del proyecto están declaradas en `go.mod` y `go.sum`. No es necesario instalarlas una por una: Go las descarga al ejecutar los comandos correspondientes.
 
-> Los handlers pueden ejecutar código personalizado. Ejecutá únicamente código que entiendas y en el que confíes.
-
 ## Instalación y ejecución
 
 1. Instalá Go desde [go.dev/dl](https://go.dev/dl/).
@@ -89,8 +87,7 @@ Consultá `PROTOCOL_FORMATS.md` para ver los detalles de los formatos de protoco
 ├── tests/      # Pruebas
 ├── go.mod
 ├── go.sum
-├── main.go
-└── PROTOCOL_FORMATS.md
+└── main.go
 ```
 
 ## Datos locales
