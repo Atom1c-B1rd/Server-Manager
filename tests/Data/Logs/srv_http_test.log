@@ -1,0 +1,3 @@
+[17:47:17] HTTP server started on port 18081
+[17:47:17] GET /hello 200 80.79µs
+[17:47:17] HTTP server stopped

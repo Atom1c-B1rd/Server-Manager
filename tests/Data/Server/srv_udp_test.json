@@ -1,0 +1,17 @@
+{
+  "id": "srv_udp_test",
+  "name": "Dynamic UDP Test",
+  "proto": "udp",
+  "port": 18084,
+  "status": "stopped",
+  "handlers": [
+    {
+      "id": "h1",
+      "name": "OnUDPData",
+      "method": "",
+      "path": "",
+      "code": "package main\nimport \"net\"\n\nfunc OnUDPData(conn *net.UDPConn, addr *net.UDPAddr, data []byte) {\n\tconn.WriteToUDP(append([]byte(\"UDP ACK: \"), data...), addr)\n}"
+    }
+  ],
+  "created_at": "2026-10-22T17:47:17Z"
+}

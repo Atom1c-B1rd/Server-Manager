@@ -1,0 +1,3 @@
+[13:34:10] Error compiling handler HandleRequest: 3:8: import "http/net" error: unable to find source related to: "http/net". Either the GOPATH environment variable, or the Interpreter.Options.GoPath needs to be set
+[13:34:10] HTTP server started on port 9000
+[13:34:15] HTTP server stopped

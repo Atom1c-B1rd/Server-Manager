@@ -1,0 +1,6 @@
+[17:47:17] Loaded custom WS handler EchoWS
+[17:47:17] WebSocket server started on port 18082
+[17:47:17] New WebSocket client connected: [::1]:48986
+[17:47:17] WS Received [7 bytes]: Ping WS
+[17:47:17] WebSocket server stopped
+[17:47:17] WS Client disconnected: [::1]:48986

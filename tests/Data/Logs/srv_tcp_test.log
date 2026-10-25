@@ -1,0 +1,6 @@
+[17:47:17] TCP server started on port 18083
+[17:47:17] Loaded custom TCP handler OnTCPData
+[17:47:17] TCP client connected: [::1]:36852
+[17:47:17] TCP Received [9 bytes]: Hello TCP
+[17:47:17] TCP server stopped
+[17:47:17] TCP client disconnected: [::1]:36852

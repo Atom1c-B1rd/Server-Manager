@@ -1,0 +1,17 @@
+{
+  "id": "srv_1792773057845191200",
+  "name": "test",
+  "proto": "http",
+  "port": 9000,
+  "status": "stopped",
+  "handlers": [
+    {
+      "id": "h_1792773061974",
+      "name": "HandleRequest",
+      "method": "GET",
+      "path": "/",
+      "code": "\n\nfunc HandleRequest(w http.ResponseWriter, r *http.Request) {\n\tw.WriteHeader(http.StatusOK)\n\tw.Write([]byte(\"Hola desde Handler Dynamic Go HTTP!\"))\n}"
+    }
+  ],
+  "created_at": "2026-10-23T13:30:57-03:00"
+}

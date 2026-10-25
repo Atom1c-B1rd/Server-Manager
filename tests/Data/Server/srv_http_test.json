@@ -1,0 +1,17 @@
+{
+  "id": "srv_http_test",
+  "name": "Dynamic HTTP Test",
+  "proto": "http",
+  "port": 18081,
+  "status": "stopped",
+  "handlers": [
+    {
+      "id": "h1",
+      "name": "HelloHandler",
+      "method": "GET",
+      "path": "/hello",
+      "code": "package main\nimport \"net/http\"\n\nfunc HelloHandler(w http.ResponseWriter, r *http.Request) {\n\tw.WriteHeader(http.StatusOK)\n\tw.Write([]byte(\"Hello from dynamic HTTP Yaegi!\"))\n}"
+    }
+  ],
+  "created_at": "2026-10-22T17:47:17Z"
+}

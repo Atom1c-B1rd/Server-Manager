@@ -1,0 +1,17 @@
+{
+  "id": "srv_tcp_test",
+  "name": "Dynamic TCP Test",
+  "proto": "tcp",
+  "port": 18083,
+  "status": "stopped",
+  "handlers": [
+    {
+      "id": "h1",
+      "name": "OnTCPData",
+      "method": "",
+      "path": "",
+      "code": "package main\nimport \"net\"\n\nfunc OnTCPData(conn net.Conn, data []byte) {\n\tconn.Write(append([]byte(\"TCP ACK: \"), data...))\n}"
+    }
+  ],
+  "created_at": "2026-10-22T17:47:17Z"
+}

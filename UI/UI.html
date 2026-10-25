@@ -1,0 +1,2816 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Server Manager</title>
+
+
+
+    <!-- Prism JS & CSS for Go Syntax Highlighting -->
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js"></script>
+
+
+
+    <style>
+        :root {
+
+            color-scheme: dark;
+
+            font-family: "Segoe UI", sans-serif;
+
+            background: #111318;
+
+            color: #e5e7eb;
+
+
+
+            --panel: #191c24;
+
+            --border: #2c303b;
+
+            --accent: #22d3ee;
+
+            --muted: #9299a8;
+
+            --green: #10b981;
+
+            --red: #ef4444;
+
+            --yellow: #f59e0b;
+
+        }
+
+
+
+        * {
+
+            box-sizing: border-box;
+
+        }
+
+
+
+        body {
+
+            margin: 0;
+
+            min-height: 100vh;
+
+            display: grid;
+
+            grid-template-columns: 280px 1fr;
+
+        }
+
+
+
+        aside {
+
+            background: var(--panel);
+
+            border-right: 1px solid var(--border);
+
+            padding: 20px;
+
+            display: flex;
+
+            flex-direction: column;
+
+        }
+
+
+
+        header {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 18px;
+
+            padding-bottom: 20px;
+
+            border-bottom: 1px solid var(--border);
+
+        }
+
+
+
+        h1 {
+
+            font-size: 20px;
+
+            margin: 0;
+
+            letter-spacing: -0.5px;
+
+            color: var(--accent);
+
+        }
+
+        .brand-title {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .docs-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border: 1px solid #596273;
+            border-radius: 50%;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1;
+            text-decoration: none;
+            transition: color .15s, border-color .15s;
+        }
+
+        .docs-link:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+
+
+        h3 {
+
+            margin: 0 0 22px;
+
+            font-size: 19px;
+
+        }
+
+
+
+        button,
+
+        input,
+
+        select,
+
+        textarea {
+
+            font: inherit;
+
+        }
+
+
+
+        button {
+
+            border: 1px solid var(--border);
+
+            border-radius: 6px;
+
+            padding: 8px 12px;
+
+            background: #242833;
+
+            color: #e5e7eb;
+
+            cursor: pointer;
+
+            transition: background* 0.15s, border-color 0.15s;
+
+        }
+
+
+
+        button:hover {
+
+            background: #303543;
+
+            border-color: #50596b;
+
+        }
+
+
+
+        #btnNewServer,
+
+        .btn {
+
+            background: var(--accent);
+
+            color: #101318;
+
+            border-color: var(--accent);
+
+            font-weight: 600;
+
+        }
+
+
+
+        #btnNewServer:hover,
+
+        .btn:hover {
+
+            background: #67e8f9;
+
+            border-color: #67e8f9;
+
+        }
+
+
+
+        .btn-danger {
+
+            background: #ef444422;
+
+            color: #f87171;
+
+            border-color: #ef444444;
+
+        }
+
+
+
+        .btn-danger:hover {
+
+            background: #ef4444;
+
+            color: white;
+
+        }
+
+
+
+        .btn-success {
+
+            background: #10b98122;
+
+            color: #34d399;
+
+            border-color: #10b98144;
+
+        }
+
+
+
+        .btn-success:hover {
+
+            background: #10b981;
+
+            color: white;
+
+        }
+
+
+
+        #list {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 8px;
+
+            padding-top: 16px;
+
+            overflow-y: auto;
+
+        }
+
+
+
+        .server-item {
+
+            padding: 12px;
+
+            background: #111318;
+
+            border: 1px solid var(--border);
+
+            border-radius: 8px;
+
+            cursor: pointer;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+        }
+
+
+
+        .server-item.active {
+
+            border-color: var(--accent);
+
+            background: #1a2332;
+
+        }
+
+
+
+        .server-title {
+
+            font-weight: 600;
+
+            font-size: 14px;
+
+        }
+
+
+
+        .server-sub {
+
+            font-size: 12px;
+
+            color: var(--muted);
+
+            text-transform: uppercase;
+
+        }
+
+
+
+        .badge {
+
+            font-size: 10px;
+
+            padding: 3px 6px;
+
+            border-radius: 12px;
+
+            font-weight: bold;
+
+            text-transform: uppercase;
+
+        }
+
+
+
+        .badge-running {
+
+            background: #10b98133;
+
+            color: #34d399;
+
+        }
+
+
+
+        .badge-stopped {
+
+            background: #6b728033;
+
+            color: #9ca3af;
+
+        }
+
+
+
+        .badge-error {
+
+            background: #ef444433;
+
+            color: #f87171;
+
+        }
+
+
+
+        main {
+
+            min-width: 0;
+
+            padding: 28px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 20px;
+
+            overflow-y: auto;
+
+        }
+
+
+
+        dialog {
+
+            width: min(460px, calc(100% - 32px));
+
+            padding: 24px;
+
+            border: 1px solid var(--border);
+
+            border-radius: 12px;
+
+            background: var(--panel);
+
+            color: inherit;
+
+            box-shadow: 0 24px 80px #0008;
+
+        }
+
+
+
+        dialog::backdrop {
+
+            background: #0009;
+
+            backdrop-filter: blur(3px);
+
+        }
+
+
+
+        .grid {
+
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 16px;
+
+            margin-bottom: 24px;
+
+        }
+
+
+
+        .f {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 8px;
+
+            font-size: 13px;
+
+            color: var(--muted);
+
+        }
+
+
+
+        .f:first-child {
+
+            grid-column: 1 / -1;
+
+        }
+
+
+
+        input,
+
+        select,
+
+        textarea {
+
+            width: 100%;
+
+            min-width: 0;
+
+            padding: 10px 12px;
+
+            border: 1px solid var(--border);
+
+            border-radius: 6px;
+
+            outline: none;
+
+            background: #111318;
+
+            color: #e5e7eb;
+
+        }
+
+
+
+        input:focus,
+
+        select:focus,
+
+        textarea:focus {
+
+            border-color: var(--accent);
+
+            box-shadow: 0 0 0 2px #22d3ee20;
+
+        }
+
+
+
+        dialog form>div:last-child {
+
+            display: flex;
+
+            justify-content: flex-end;
+
+            gap: 10px;
+
+        }
+
+
+
+        /* Detail View Layout */
+
+        .card {
+
+            background: var(--panel);
+
+            border: 1px solid var(--border);
+
+            border-radius: 10px;
+
+            padding: 20px;
+
+        }
+
+
+
+        .card-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 16px;
+
+        }
+
+
+
+        .logs-box {
+
+            background: #0d0e12;
+
+            border: 1px solid var(--border);
+
+            border-radius: 6px;
+
+            padding: 12px;
+
+            height: 220px;
+
+            overflow-y: auto;
+
+            font-family: monospace;
+
+            font-size: 13px;
+
+            color: #a7f3d0;
+
+            white-space: pre-wrap;
+
+        }
+
+
+
+        /* Editor Go con resaltado: <pre> con tokens de Prism detrás, <textarea> transparente encima */
+
+        .code-container {
+
+            position: relative;
+
+            background: #0d0e12;
+
+            border-radius: 6px;
+
+        }
+
+
+
+        .code-container pre.code-highlight,
+
+        .code-container .code-editor {
+
+            box-sizing: border-box;
+
+            margin: 0;
+
+            padding: 12px;
+
+            border: 1px solid var(--border);
+
+            border-radius: 6px;
+
+            font-family: "Fira Code", "JetBrains Mono", Consolas, "Courier New", monospace;
+
+            font-size: 13px;
+
+            line-height: 1.5;
+
+            letter-spacing: 0;
+
+            font-variant-ligatures: none;
+
+            tab-size: 4;
+
+            -moz-tab-size: 4;
+
+            white-space: pre;
+
+            word-wrap: normal;
+
+            overflow-wrap: normal;
+
+            text-align: left;
+
+        }
+
+
+
+        .code-container pre.code-highlight {
+
+            position: absolute;
+
+            inset: 0;
+
+            overflow: hidden;
+
+            pointer-events: none;
+
+            background: transparent;
+
+            border-color: transparent;
+
+            padding-bottom: 32px;
+
+            color: #f8f8f2;
+
+        }
+
+
+
+        .code-container pre.code-highlight code {
+
+            font: inherit;
+
+            color: inherit;
+
+            background: none;
+
+            text-shadow: none;
+
+            white-space: inherit;
+
+            tab-size: inherit;
+
+        }
+
+
+
+        .code-container .code-editor {
+
+            position: relative;
+
+            z-index: 1;
+
+            display: block;
+
+            width: 100%;
+
+            height: 420px;
+
+            min-height: 240px;
+
+            overflow: auto;
+
+            resize: vertical;
+
+            background: transparent;
+
+            color: transparent;
+
+            -webkit-text-fill-color: transparent;
+
+            caret-color: #f8f8f2;
+
+        }
+
+
+
+        .code-container .code-editor::selection {
+
+            background: rgba(34, 211, 238, 0.30);
+
+        }
+
+
+
+        /* ---- Configuración del server ---- */
+
+        details#settingsCard {
+            display: block;
+            width: 100%;
+            min-width: 0;
+        }
+
+        details#settingsCard>summary {
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 36px;
+            padding: 4px 0;
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 16px;
+            visibility: visible;
+            opacity: 1;
+            user-select: none;
+        }
+
+        details#settingsCard>summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details#settingsCard>summary::marker {
+            content: "";
+        }
+
+        details#settingsCard>summary::before {
+            content: "▸";
+            color: var(--accent);
+            display: inline-block;
+            flex-shrink: 0;
+            transition: transform 0.15s;
+        }
+
+        details#settingsCard[open]>summary::before {
+            transform: rotate(90deg);
+        }
+
+        details#settingsCard>summary:hover {
+            color: #67e8f9;
+        }
+
+        details#settingsCard>summary .s-dirty {
+            margin-left: auto;
+        }
+
+        .s-dirty {
+
+            margin-left: auto;
+
+            font-size: 11px;
+
+            font-weight: 600;
+
+            color: var(--yellow);
+
+        }
+
+
+
+        .s-section {
+
+            margin-top: 22px;
+
+            padding-top: 18px;
+
+            border-top: 1px solid var(--border);
+
+        }
+
+
+
+        .s-section:first-child {
+
+            margin-top: 18px;
+
+            padding-top: 0;
+
+            border-top: none;
+
+        }
+
+
+
+        .s-section h4 {
+
+            margin: 0 0 4px;
+
+            font-size: 14px;
+
+        }
+
+
+
+        .s-help {
+
+            margin: 0 0 12px;
+
+            font-size: 12px;
+
+            color: var(--muted);
+
+            line-height: 1.5;
+
+        }
+
+
+
+        .s-warn {
+
+            color: var(--yellow);
+
+        }
+
+
+
+        .s-grid {
+
+            display: grid;
+
+            grid-template-columns: 2fr 1fr;
+
+            gap: 14px;
+
+            margin-bottom: 12px;
+
+        }
+
+
+
+        .s-field {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 6px;
+
+            font-size: 13px;
+
+            color: var(--muted);
+
+        }
+
+
+
+        .s-check {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            font-size: 13px;
+
+        }
+
+
+
+        .s-input {
+
+            width: 100%;
+
+            min-width: 0;
+
+            padding: 8px 10px;
+
+            border: 1px solid var(--border);
+
+            border-radius: 6px;
+
+            background: #0d0e12;
+
+            color: inherit;
+
+        }
+
+
+
+        .s-input:focus {
+
+            outline: none;
+
+            border-color: var(--accent);
+
+        }
+
+
+
+        .s-input.mono {
+
+            font-family: "Fira Code", "JetBrains Mono", Consolas, "Courier New", monospace;
+
+            font-size: 12.5px;
+
+        }
+
+
+
+        .s-row {
+
+            display: grid;
+
+            gap: 8px;
+
+            margin-bottom: 8px;
+
+            align-items: center;
+
+        }
+
+
+
+        .s-row.env {
+
+            grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) 36px;
+
+        }
+
+
+
+        .s-row.db {
+
+            grid-template-columns: 110px 110px minmax(0, 1fr) auto 36px;
+
+        }
+
+
+
+        .s-row.dep {
+
+            grid-template-columns: minmax(0, 2fr) 120px 96px 36px;
+
+        }
+
+
+
+        .s-x {
+
+            padding: 8px 0;
+
+        }
+
+
+
+        .s-actions {
+
+            display: flex;
+
+            gap: 10px;
+
+            flex-wrap: wrap;
+
+            margin-top: 6px;
+
+        }
+
+
+
+        .s-code {
+
+            margin: 12px 0 0;
+
+            padding: 12px;
+
+            border: 1px solid var(--border);
+
+            border-radius: 6px;
+
+            background: #0d0e12;
+
+            color: #f8f8f2;
+
+            font-family: "Fira Code", "JetBrains Mono", Consolas, "Courier New", monospace;
+
+            font-size: 12.5px;
+
+            line-height: 1.5;
+
+            tab-size: 4;
+
+            overflow-x: auto;
+
+        }
+
+
+
+        .s-code code {
+
+            font: inherit;
+
+            background: none;
+
+            text-shadow: none;
+
+        }
+
+
+
+        .badge-pending {
+
+            background: #f59e0b33;
+
+            color: #fbbf24;
+
+        }
+
+
+
+        .s-badge {
+
+            text-align: center;
+
+        }
+
+
+
+        button:disabled {
+
+            opacity: 0.45;
+
+            cursor: not-allowed;
+
+        }
+
+
+
+        #toasts {
+
+            position: fixed;
+
+            right: 20px;
+
+            bottom: 20px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 8px;
+
+            z-index: 1000;
+
+        }
+
+
+
+        .toast {
+
+            max-width: 440px;
+
+            padding: 10px 14px;
+
+            border: 1px solid var(--border);
+
+            border-radius: 8px;
+
+            background: var(--panel);
+
+            font-size: 13px;
+
+            line-height: 1.45;
+
+            box-shadow: 0 8px 30px #0008;
+
+            white-space: pre-wrap;
+
+            word-break: break-word;
+
+        }
+
+
+
+        .toast.ok {
+
+            border-color: #10b98166;
+
+        }
+
+
+
+        .toast.err {
+
+            border-color: #ef444477;
+
+            color: #fca5a5;
+
+        }
+
+
+
+        .handler-item {
+            background: #111318;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+
+        .collapsible-card>summary,
+        .handler-summary {
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            user-select: none;
+        }
+
+        .collapsible-card>summary::-webkit-details-marker,
+        .handler-summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .collapsible-card>summary::marker,
+        .handler-summary::marker {
+            content: "";
+        }
+
+        .collapsible-card>summary::before,
+        .handler-summary::before {
+            content: "▸";
+            color: var(--muted);
+            display: inline-block;
+            transition: transform .15s;
+        }
+
+        .collapsible-card[open]>summary::before,
+        .handler-item[open]>.handler-summary::before {
+            transform: rotate(90deg);
+        }
+
+        .collapsible-card>summary:hover,
+        .handler-summary:hover {
+            color: #67e8f9;
+        }
+
+        .collapsible-content {
+            margin-top: 18px;
+        }
+
+        .handler-summary {
+            padding: 14px 16px;
+        }
+
+        .handler-route {
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .handler-body {
+            padding: 0 16px 16px;
+        }
+
+        .handler-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .handler-item .code-container {
+            margin-top: 10px;
+        }
+
+
+
+        .empty-state {
+
+            text-align: center;
+
+            color: var(--muted);
+
+            padding: 60px 20px;
+
+        }
+
+
+
+        @media (max-width: 600px) {
+
+            body {
+
+                grid-template-columns: 1fr;
+
+            }
+
+
+
+            aside {
+
+                border-right: none;
+
+                border-bottom: 1px solid var(--border);
+
+            }
+
+
+
+            main {
+
+                padding: 20px;
+
+            }
+
+        }
+    </style>
+
+</head>
+
+
+
+<body>
+
+    <aside>
+
+        <header>
+
+            <div class="brand-title">
+                <h1>Server-Manager</h1>
+                <a class="docs-link" href="/docs" target="_blank" rel="noopener noreferrer" aria-label="Abrir documentación" title="Documentación">ⓘ</a>
+            </div>
+
+            <button id="btnNewServer">Nuevo server</button>
+
+        </header>
+
+        <div id="list"></div>
+
+    </aside>
+
+
+
+    <main id="main">
+
+        <div class="empty-state">
+
+            <h3>Selecciona o crea un servidor</h3>
+
+            <p>Elegí un servidor de la lista lateral para administrar sus handlers, logs y estado.</p>
+
+        </div>
+
+    </main>
+
+
+
+    <dialog>
+
+        <form id="newForm">
+
+            <h3>Nuevo Server</h3>
+
+
+
+            <div class="grid">
+
+                <label class="f">
+
+                    Nombre
+
+                    <input name="name" required placeholder="chat-ws" />
+
+                </label>
+
+
+
+                <label class="f">
+
+                    Protocol
+
+                    <select name="proto">
+
+                        <option value="tcp">TCP</option>
+
+                        <option value="udp">UDP</option>
+
+                        <option value="ws">WebSocket</option>
+
+                        <option value="http">HTTP (Echo)</option>
+
+                    </select>
+
+                </label>
+
+
+
+                <label class="f">
+
+                    Puerto
+
+                    <input name="port" type="number" value="9000" min="1" max="65535" required />
+
+                </label>
+
+            </div>
+
+
+
+            <div>
+
+                <button type="button" id="dlgCancel">Cancelar</button>
+
+                <button type="submit" class="btn">Crear</button>
+
+            </div>
+
+        </form>
+
+    </dialog>
+
+
+
+    <div id="toasts"></div>
+
+
+
+    <script type="module">
+
+        let servers = [];
+
+        let activeServerId = null;
+
+        let meta = { drivers: [], go_available: true };
+
+        const settingsDrafts = {}; // id -> { dirty, data } (cambios sin guardar)
+
+        let settingsOpen = false;
+
+
+
+        const form = document.getElementById("newForm");
+
+        const cancelButton = document.getElementById("dlgCancel");
+
+        const list = document.getElementById("list");
+
+        const main = document.getElementById("main");
+
+        const dialog = document.querySelector("dialog");
+
+
+
+        const ws = new WebSocket(`ws://${location.host}/in`);
+
+
+
+        ws.onopen = () => {
+
+            console.log("WebSocket connected to backend");
+
+            ws.send(JSON.stringify({ type: "list_servers" }));
+
+        };
+
+
+
+        ws.onmessage = (event) => {
+
+            try {
+
+                const msg = JSON.parse(event.data);
+
+                handleMessage(msg);
+
+            } catch (err) {
+
+                console.error("Failed to parse WS message:", err);
+
+            }
+
+        };
+
+
+
+        setInterval(() => {
+
+            if (activeServerId && ws.readyState === WebSocket.OPEN) {
+
+                ws.send(JSON.stringify({ type: "get_logs", target: activeServerId }));
+
+            }
+
+        }, 1500);
+
+
+
+        function handleMessage(msg) {
+
+            switch (msg.type) {
+
+                case "server_list":
+
+                    servers = msg.data || [];
+
+                    renderServerList();
+
+                    if (activeServerId) {
+
+                        const current = servers.find(s => s.id === activeServerId);
+
+                        if (current) renderServerDetails(current);
+
+                    }
+
+                    break;
+
+
+
+                case "logs":
+
+                    if (activeServerId && msg.target === activeServerId) {
+
+                        const logsBox = document.getElementById("logsBox");
+
+                        if (logsBox) {
+
+                            logsBox.textContent = (msg.data || []).join("\n");
+
+                            logsBox.scrollTop = logsBox.scrollHeight;
+
+                        }
+
+                    }
+
+                    break;
+
+
+
+                case "server_created":
+
+                    toast(msg.data ? msg.data.message : "Servidor creado", "ok");
+
+                    break;
+
+                case "global_script_saved":
+                    toast(msg.data ? msg.data.message : "Código global guardado", "ok");
+                    break;
+
+                case "error":
+
+                    toast(msg.data ? msg.data.message : "Error desconocido", "err");
+
+                    break;
+
+
+
+                case "meta":
+
+                    meta = Object.assign(meta, msg.data || {});
+
+                    if (activeServerId) {
+
+                        const cur = servers.find(s => s.id === activeServerId);
+
+                        if (cur) renderServerDetails(cur);
+
+                    }
+
+                    break;
+
+
+
+                case "settings_saved": {
+
+                    delete settingsDrafts[msg.target];
+
+                    const r = msg.data || {};
+
+                    if (r.restart_error) {
+
+                        toast("Configuración guardada, pero el server no pudo reiniciarse: " + r.restart_error, "err");
+
+                    } else {
+
+                        toast(r.restarted ? "Configuración guardada y server reiniciado" : "Configuración guardada", "ok");
+
+                    }
+
+                    break;
+
+                }
+
+
+
+                case "db_test": {
+
+                    const r = msg.data || {};
+
+                    const label = r.name ? `«${r.name}»` : "";
+
+                    toast(r.ok ? `Conexión ${label} correcta` : `Conexión ${label} falló: ${r.message}`, r.ok ? "ok" : "err");
+
+                    break;
+
+                }
+
+
+
+                case "deps_installed": {
+
+                    const r = msg.data || {};
+
+                    toast(r.ok ? (r.message + (r.restarted ? " (server reiniciado)" : "")) : ("No se pudieron instalar las dependencias:\n" + r.message), r.ok ? "ok" : "err");
+
+                    break;
+
+                }
+
+            }
+
+        }
+
+
+
+        function sendMsg(type, target, data = null) {
+
+            if (ws.readyState === WebSocket.OPEN) {
+
+                ws.send(JSON.stringify({ type, target, data }));
+
+            }
+
+        }
+
+
+
+        function renderServerList() {
+
+            list.innerHTML = "";
+
+            servers.forEach((srv) => {
+
+                const item = document.createElement("div");
+
+                item.className = `server-item ${srv.id === activeServerId ? 'active' : ''}`;
+
+                item.onclick = () => selectServer(srv.id);
+
+
+
+                item.innerHTML = `
+
+                    <div>
+
+                        <div class="server-title">${escapeHtml(srv.name)}</div>
+
+                        <div class="server-sub">${srv.proto} :${srv.port}</div>
+
+                    </div>
+
+                    <span class="badge badge-${srv.status || 'stopped'}">${srv.status || 'stopped'}</span>
+
+                `;
+
+                list.appendChild(item);
+
+            });
+
+        }
+
+
+
+        function selectServer(id) {
+
+            activeServerId = id;
+
+            renderServerList();
+
+            const srv = servers.find(s => s.id === id);
+
+            if (srv) {
+
+                renderServerDetails(srv);
+
+                sendMsg("get_logs", id);
+
+            }
+
+        }
+
+
+
+        // Conserva el estado de los desplegables cuando el servidor se vuelve a renderizar.
+        const serverUiStates = new Map();
+
+        function captureServerUiState(srv) {
+            const current = document.getElementById("main");
+            if (!current) return;
+
+            const details = {};
+            current.querySelectorAll("details[id]").forEach(card => {
+                details[card.id] = card.open;
+            });
+
+            const handlers = {};
+            current.querySelectorAll(".handler-item[data-handler-key]").forEach(card => {
+                handlers[card.dataset.handlerKey] = card.open;
+            });
+
+            serverUiStates.set(String(srv.id), { details, handlers });
+        }
+
+        function restoreServerUiState(srv) {
+            const state = serverUiStates.get(String(srv.id));
+            if (!state) return;
+
+            // Restaurar todos los desplegables identificados, no solo Logs/Handlers/Ajustes.
+            document.querySelectorAll("#main details[id]").forEach(card => {
+                if (Object.prototype.hasOwnProperty.call(state.details || {}, card.id)) {
+                    card.open = state.details[card.id];
+                }
+            });
+            const settings = document.getElementById("settingsCard");
+            if (settings) settingsOpen = settings.open;
+
+            document.querySelectorAll(".handler-item[data-handler-key]").forEach(card => {
+                const key = card.dataset.handlerKey;
+                // Los handlers existentes conservan su estado; los recién creados se abren.
+                card.open = Object.prototype.hasOwnProperty.call(state.handlers || {}, key)
+                    ? state.handlers[key]
+                    : true;
+            });
+        }
+
+        function renderServerDetails(srv) {
+
+            captureServerUiState(srv);
+            const isRunning = srv.status === "running";
+
+            const handlers = srv.handlers || [];
+
+
+
+            main.innerHTML = `
+
+                <div class="card">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h2 style="margin:0">${escapeHtml(srv.name)}</h2>
+
+                            <small style="color:var(--muted)">Protocolo: ${srv.proto.toUpperCase()} | Puerto: ${srv.port}</small>
+
+                        </div>
+
+                        <div style="display:flex; gap:10px;">
+
+                            ${isRunning ?
+
+                    `<button class="btn-danger" id="btnStop">Detener Server</button>` :
+
+                    `<button class="btn-success" id="btnStart">Iniciar Server</button>`
+
+                }
+                            <button class="btn-danger" id="btnDelete">Eliminar Server</button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                ${settingsCardHtml(srv)}
+
+
+
+                <details class="card collapsible-card" id="logsCard">
+                    <summary>Logs en Vivo</summary>
+                    <div class="collapsible-content">
+                        <div class="card-header">
+                            <span style="color:var(--muted);font-size:12px">Registro de actividad del servidor</span>
+                            <button id="btnClearLogs" type="button">Limpiar Vista</button>
+                        </div>
+                        <div class="logs-box" id="logsBox">Cargando logs...</div>
+                    </div>
+                </details>
+
+                <details class="card collapsible-card" id="globalsCard">
+                    <summary>Código global del servidor</summary>
+                    <div class="collapsible-content">
+                        <p style="color:var(--muted);margin:0 0 12px">
+                            Declaraciones compartidas disponibles para todas las rutas y handlers: structs, variables globales y funciones auxiliares.
+                            Los imports y el enrutamiento se generan automáticamente y no se editan aquí.
+                        </p>
+                        <div class="code-container">
+                            <pre class="code-highlight" aria-hidden="true"><code></code></pre>
+                            <textarea class="code-editor" id="globalDeclarationsEditor" spellcheck="false" autocomplete="off" autocapitalize="off" wrap="off">${escapeHtml(getGlobalDeclarations(srv.global_script || ""))}</textarea>
+                        </div>
+                        <div class="handler-actions" style="margin-top:12px">
+                            <button class="btn" id="btnSaveGlobals" type="button">Guardar código global</button>
+                        </div>
+                        <p style="color:var(--muted);font-size:12px;margin-top:8px">Ejemplo: <code>type User struct { ID int; Name string }</code>. Para bases de datos, configurá la conexión en Ajustes y usá el SDK desde las funciones globales.</p>
+                    </div>
+                </details>
+
+                ${['ws','tcp'].includes(srv.proto) ? `
+                <details class="card collapsible-card" id="protocolOptionsCard">
+                    <summary>Formato de mensajes</summary>
+                    <div class="collapsible-content">
+                        <label class="f">Campo JSON que identifica el tipo
+                            <input id="messageTypeField" value="${escapeHtml(srv.message_type_field || 'type')}" placeholder="type" />
+                        </label>
+                        <p style="color:var(--muted);font-size:12px">Cada mensaje TCP debe terminar en salto de línea y contener JSON. Ejemplo: {"type":"login","data":{"username":"admin"}}. Podés cambiar <code>type</code> por <code>action</code>, <code>event</code>, etc.</p>
+                        <button class="btn" id="btnSaveProtocolOptions" type="button">Guardar formato</button>
+                    </div>
+                </details>` : ''}
+
+                ${srv.proto === 'ws' ? `
+                <details class="card collapsible-card" id="routesCard">
+                    <summary>Rutas WebSocket</summary>
+                    <div class="collapsible-content">
+                        <div class="card-header"><span style="color:var(--muted);font-size:12px">Endpoints que aceptan el handshake WebSocket</span><button class="btn" id="btnAddRoute" type="button">+ Agregar ruta</button></div>
+                        <div id="routesList"></div>
+                    </div>
+                </details>` : ''}
+
+                <details class="card collapsible-card" id="handlersCard">
+                    <summary> ${srv.proto === 'http' ? 'Ruta' : 'Handler'} &amp; Scripts Go</summary>
+                    <div class="collapsible-content">
+                        <div class="card-header">
+                            <span style="color:var(--muted);font-size:12px">Código y configuración de handlers</span>
+                            <button class="btn" id="btnAddHandler" type="button"> ${srv.proto === 'http' ? '+ Agregar Ruta' : '+ Agregar Handler'}</button>
+                        </div>
+                        <div id="handlersList">
+                            ${handlers.length === 0 ? '<p style="color:var(--muted)">No hay handlers configurados.</p>' : ''}
+                        </div>
+                    </div>
+                </details>
+
+            `;
+
+
+
+            wireSettings(srv);
+
+            const globalEditor = document.getElementById("globalDeclarationsEditor");
+            if (globalEditor) {
+                setupCodeEditor(globalEditor);
+                document.getElementById("btnSaveGlobals").onclick = () => {
+                    sendMsg("save_global_script", srv.id, { code: globalEditor.value });
+                };
+            }
+
+            const btnSaveProtocolOptions = document.getElementById("btnSaveProtocolOptions");
+            if (btnSaveProtocolOptions) btnSaveProtocolOptions.onclick = () => sendMsg("save_protocol_options", srv.id, { message_type_field: document.getElementById("messageTypeField").value.trim() || "type" });
+
+            if (srv.proto === 'ws') {
+                const routesList = document.getElementById("routesList");
+                const routes = (srv.routes && srv.routes.length) ? srv.routes : [{ id: "r_default", path: "/" }];
+                routes.forEach((route, idx) => {
+                    const row = document.createElement("div"); row.className = "handler-actions"; row.style.margin = "8px 0";
+                    row.innerHTML = `<input id="routePath_${idx}" value="${escapeHtml(route.path || '/') }" placeholder="/chat" style="flex:1"/><button class="btn" id="routeSave_${idx}" type="button">Guardar</button><button class="btn-danger" id="routeDel_${idx}" type="button">Eliminar</button>`;
+                    routesList.appendChild(row);
+                    document.getElementById(`routeSave_${idx}`).onclick = () => sendMsg("save_route", srv.id, { id: route.id || ("r_" + Date.now()), path: document.getElementById(`routePath_${idx}`).value.trim() || "/" });
+                    document.getElementById(`routeDel_${idx}`).onclick = () => sendMsg("delete_route", srv.id, { route_id: route.id });
+                });
+                document.getElementById("btnAddRoute").onclick = () => { const path = prompt("Ruta WebSocket (ej. /chat):", "/chat"); if (!path) return; sendMsg("save_route", srv.id, { id: "r_" + Date.now(), path: path.trim() }); };
+            }
+
+            const settingsButton = document.getElementById("btnSettings");
+            if (settingsButton) {
+                settingsButton.addEventListener("click", () => {
+                    const settingsCard = document.getElementById("settingsCard");
+                    if (!settingsCard) return;
+                    settingsCard.open = true;
+                    settingsOpen = true;
+                    settingsCard.scrollIntoView({ behavior: "smooth", block: "start" });
+                });
+            }
+
+
+
+            if (document.getElementById("btnStart")) {
+
+                document.getElementById("btnStart").onclick = () => sendMsg("start_server", srv.id);
+
+            }
+
+            if (document.getElementById("btnStop")) {
+
+                document.getElementById("btnStop").onclick = () => sendMsg("stop_server", srv.id);
+
+            }
+
+            if (document.getElementById("btnDelete")) {
+
+                document.getElementById("btnDelete").onclick = () => {
+
+                    if (confirm(`¿Seguro que deseas eliminar ${srv.name}?`)) {
+
+                        sendMsg("delete_server", srv.id);
+
+                        activeServerId = null;
+
+                        main.innerHTML = `<div class="empty-state"><h3>Selecciona o crea un servidor</h3></div>`;
+
+                    }
+
+                };
+
+            }
+
+            if (document.getElementById("btnClearLogs")) {
+
+                document.getElementById("btnClearLogs").onclick = () => {
+
+                    document.getElementById("logsBox").textContent = "";
+
+                };
+
+            }
+
+            if (document.getElementById("btnAddHandler")) {
+
+                document.getElementById("btnAddHandler").onclick = () => renderAddHandlerForm(srv);
+
+            }
+
+
+
+            // Render Handlers
+
+            const hList = document.getElementById("handlersList");
+
+            handlers.forEach((h, idx) => {
+
+                const card = document.createElement("details");
+                card.className = "handler-item";
+                card.dataset.handlerKey = String(h.id || `${h.name || "handler"}:${idx}`);
+                card.open = false;
+
+
+
+                let defaultSample = getSampleCode(srv.proto, h.name);
+
+                let codeVal = h.code || defaultSample;
+
+
+
+                card.innerHTML = `
+                    <summary class="handler-summary">
+                        <strong>${escapeHtml(h.name)}</strong>
+                        ${srv.proto === 'http' ? `<span class="handler-route">${h.method || 'GET'} ${escapeHtml(h.path || '/')}</span>` : (srv.proto === 'ws' || srv.proto === 'tcp' || srv.proto === 'udp' ? `<span class="handler-route">tipo: ${escapeHtml(h.path || '*')}</span>` : '')}
+                    </summary>
+                    <div class="handler-body">
+                        <div class="handler-actions">
+                            <button class="btn" id="btnSaveH_${idx}" type="button"> ${srv.proto === 'http' ? '+ Guardar Ruta' : '+ Guardar Handler'}</button>
+                            <button class="btn-danger" id="btnDelH_${idx}" type="button">Eliminar</button>
+                        </div>
+                    ${srv.proto === 'http' ? `
+
+                    <div class="grid" style="margin-bottom:12px;">
+
+                        <label class="f">
+
+                            Método HTTP
+
+                            <select id="hMethod_${idx}">
+
+                                <option value="GET" ${h.method === 'GET' ? 'selected' : ''}>GET</option>
+
+                                <option value="POST" ${h.method === 'POST' ? 'selected' : ''}>POST</option>
+
+                                <option value="PUT" ${h.method === 'PUT' ? 'selected' : ''}>PUT</option>
+
+                                <option value="DELETE" ${h.method === 'DELETE' ? 'selected' : ''}>DELETE</option>
+
+                            </select>
+
+                        </label>
+
+                        <label class="f">
+
+                            Ruta Path
+
+                            <input id="hPath_${idx}" value="${escapeHtml(h.path || '/')}" />
+
+                        </label>
+
+                    </div>` : (['ws','tcp','udp'].includes(srv.proto) ? `
+                    <div class="grid" style="margin-bottom:12px;">
+                        ${srv.proto === 'ws' ? `
+                        <label class="f">Ruta WebSocket asociada
+                            <select id="hRoute_${idx}">
+                                ${(srv.routes && srv.routes.length ? srv.routes : [{id:'r_default',path:'/'}]).map(route => `<option value="${escapeHtml(route.id || 'r_default')}" ${(h.route_id || (srv.routes && srv.routes[0] && srv.routes[0].id) || 'r_default') === (route.id || 'r_default') ? 'selected' : ''}>${escapeHtml(route.path || '/')}</option>`).join('')}
+                            </select>
+                        </label>` : ''}
+                        <label class="f">Tipo de mensaje${srv.proto === 'udp' ? ' (cabecera UDP)' : ' (campo JSON configurado)'}
+                            <input id="hPath_${idx}" value="${escapeHtml(h.path || '*')}" placeholder="login" />
+                        </label>
+                    </div>` : '')}
+
+                    <div class="code-container">
+
+                        <pre class="code-highlight" aria-hidden="true"><code></code></pre>
+
+                        <textarea class="code-editor" id="codeEditor_${idx}" spellcheck="false" autocomplete="off" autocapitalize="off" wrap="off">${escapeHtml(codeVal)}</textarea>
+
+                    </div>
+                    </div>
+                `;
+
+                hList.appendChild(card);
+
+
+
+                setupCodeEditor(document.getElementById(`codeEditor_${idx}`));
+
+
+
+                document.getElementById(`btnSaveH_${idx}`).onclick = () => {
+
+                    const code = document.getElementById(`codeEditor_${idx}`).value;
+
+                    const updatedHandler = {
+
+                        id: h.id || "h_" + Date.now(),
+
+                        name: h.name,
+
+                        code: code,
+
+                        method: srv.proto === 'http' ? document.getElementById(`hMethod_${idx}`).value : "",
+
+                        path: ['http','ws','tcp','udp'].includes(srv.proto) ? document.getElementById(`hPath_${idx}`).value : "",
+
+                        route_id: srv.proto === 'ws' ? document.getElementById(`hRoute_${idx}`).value : ""
+
+                    };
+
+                    sendMsg("save_handler", srv.id, updatedHandler);
+
+                };
+
+
+
+                document.getElementById(`btnDelH_${idx}`).onclick = () => {
+
+                    sendMsg("delete_handler", srv.id, { handler_id: h.id });
+
+                };
+
+            });
+
+            restoreServerUiState(srv);
+        }
+
+
+
+        function renderAddHandlerForm(srv) {
+
+            const name = prompt("Nombre de la función Handler Go:", "HandleRequest");
+
+            if (!name) return;
+
+
+
+            const newH = {
+
+                id: "h_" + Date.now(),
+
+                name: name.trim(),
+
+                method: "GET",
+
+                path: "/",
+
+                code: getSampleCode(srv.proto, name.trim())
+
+            };
+
+
+
+            sendMsg("save_handler", srv.id, newH);
+
+        }
+
+
+
+        // Everything before this marker is generated infrastructure (package/imports).
+        // The editor only exposes the user's declarations after the marker.
+        const GLOBAL_DECLARATIONS_MARKER = "// SERVER_MANAGER_GLOBAL_DECLARATIONS";
+
+        function getGlobalDeclarations(source) {
+            const text = String(source || "");
+            const markerAt = text.indexOf(GLOBAL_DECLARATIONS_MARKER);
+            if (markerAt !== -1) {
+                return text.slice(markerAt + GLOBAL_DECLARATIONS_MARKER.length).trim();
+            }
+
+            // Backward compatibility for configs saved before the marker existed.
+            // Match import blocks by their own closing line, not arbitrary ')' characters
+            // inside later function calls or declarations.
+            return text
+                .replace(/^\s*package\s+[A-Za-z_][A-Za-z0-9_]*\s*;?\s*/m, "")
+                .replace(/^[ \t]*import[ \t]*\([\s\S]*?^[ \t]*\)[ \t]*;?[ \t]*(?:\r?\n)?/gm, "")
+                .replace(/^\s*import\s+(?:(?:[A-Za-z_][A-Za-z0-9_]*|\.)\s+)?"[^"\n]+"\s*;?\s*$/gm, "")
+                .trim();
+        }
+
+        function getDefaultGlobalScript(proto) {
+            const common = `package main\n\nimport (\n    "encoding/json"\n    "fmt"\n    sdk "server-manager/sdk"`;
+            switch (proto) {
+                case "http": return common + `\n    "net/http"\n)`;
+                case "ws": return common + `\n    "github.com/gorilla/websocket"\n)`;
+                case "tcp": return common + `\n    "net"\n)`;
+                case "udp": return common + `\n    "net"\n)`;
+                default: return common + `\n)`;
+            }
+        }
+
+        function getSampleCode(proto, name) {
+            switch (proto) {
+                case "http": return `func ${name}(w http.ResponseWriter, r *http.Request) {\n    w.Header().Set("Content-Type", "text/plain; charset=utf-8")\n    w.WriteHeader(http.StatusOK)\n    _, _ = w.Write([]byte("Hola desde Handler HTTP!"))\n}`;
+                case "ws": return `func ${name}(conn *websocket.Conn, msgType int, payload []byte) error {\n    return conn.WriteMessage(msgType, append([]byte("Echo: "), payload...))\n}`;
+                case "tcp": return `func ${name}(conn net.Conn, data []byte) {\n    reply := append([]byte("TCP Received: "), data...)\n    reply = append(reply, '\\n')\n    _, _ = conn.Write(reply)\n}`;
+                case "udp": return `func ${name}(conn *net.UDPConn, addr *net.UDPAddr, data []byte) {\n    _, _ = conn.WriteToUDP(append([]byte("UDP Received: "), data...), addr)\n}`;
+                default: return `func ${name}() {\n}`;
+            }
+        }
+
+        // ---------- Configuración del server ----------
+
+        const DSN_HINTS = {
+
+            postgres: "postgres://user:pass@localhost:5432/db?sslmode=disable",
+
+            mysql: "user:pass@tcp(localhost:3306)/db",
+
+            sqlite: "file:data.db",
+
+            sqlite3: "file:data.db",
+
+        };
+
+
+
+        function toast(text, kind = "ok") {
+
+            const box = document.getElementById("toasts");
+
+            const el = document.createElement("div");
+
+            el.className = `toast ${kind}`;
+
+            el.textContent = text;
+
+            box.appendChild(el);
+
+            setTimeout(() => el.remove(), kind === "err" ? 9000 : 4500);
+
+        }
+
+
+
+        function settingsState(srv) {
+
+            const existing = settingsDrafts[srv.id];
+
+            if (existing && existing.dirty) return existing;
+
+            const st = {
+
+                dirty: false,
+
+                data: {
+
+                    name: srv.name,
+
+                    port: srv.port,
+
+                    autostart: !!srv.autostart,
+
+                    env: (srv.env || []).map(e => ({ key: e.key, value: e.value })),
+
+                    databases: (srv.databases || []).map(d => ({ name: d.name, driver: d.driver, dsn: d.dsn })),
+
+                    dependencies: (srv.dependencies || []).map(d => ({ path: d.path, version: d.version })),
+
+                },
+
+            };
+
+            settingsDrafts[srv.id] = st;
+
+            return st;
+
+        }
+
+
+
+        function depBadge(srv, dep) {
+
+            const norm = (v) => (v || "latest");
+
+            const saved = (srv.dependencies || []).find(x => x.path === dep.path && norm(x.version) === norm(dep.version));
+
+            if (!saved) return `<span class="badge badge-stopped s-badge">sin guardar</span>`;
+
+            if (saved.status === "installed") return `<span class="badge badge-running s-badge">instalada</span>`;
+
+            if (saved.status === "error") return `<span class="badge badge-error s-badge" title="${escapeHtml(saved.message || "")}">error</span>`;
+
+            return `<span class="badge badge-pending s-badge">pendiente</span>`;
+
+        }
+
+
+
+
+
+        function settingsCardHtml(srv) {
+
+            const st = settingsState(srv);
+
+
+
+            return `
+
+        <details class="card" id="settingsCard">
+
+            <summary>
+
+                Configuración
+
+                <span class="s-dirty" id="settingsDirty"
+
+                    ${st.dirty ? "" : "hidden"}>
+
+                    ● cambios sin guardar
+
+                </span>
+
+            </summary>
+
+            <div id="settingsBody">${settingsBodyHtml(srv, st)}</div>
+
+        </details>`;
+
+        }
+
+
+
+
+
+        function settingsBodyHtml(srv, st) {
+
+            const d = st.data;
+
+            const attr = (v) => escapeHtml(v == null ? "" : String(v));
+
+
+
+            const driverOptions = (cur) => {
+
+                const list = [...(meta.drivers || [])];
+
+                if (cur && !list.includes(cur)) list.push(cur);
+
+                return `<option value="">driver…</option>` + list.map(x =>
+
+                    `<option value="${attr(x)}" ${x === cur ? "selected" : ""}>${attr(x)}${(meta.drivers || []).includes(x) ? "" : " (no disponible)"}</option>`
+
+                ).join("");
+
+            };
+
+
+
+            const envRows = d.env.map((e, i) => `
+
+                <div class="s-row env" data-kind="env" data-i="${i}">
+
+                    <input class="s-input mono" data-f="key" placeholder="API_KEY" spellcheck="false" autocomplete="off" value="${attr(e.key)}" />
+
+                    <input class="s-input mono" data-f="value" placeholder="valor" spellcheck="false" autocomplete="off" value="${attr(e.value)}" />
+
+                    <button type="button" class="btn-danger s-x" data-act="del" title="Quitar">✕</button>
+
+                </div>`).join("");
+
+
+
+            const dbRows = d.databases.map((c, i) => `
+
+                <div class="s-row db" data-kind="databases" data-i="${i}">
+
+                    <input class="s-input mono" data-f="name" placeholder="main" spellcheck="false" autocomplete="off" value="${attr(c.name)}" />
+
+                    <select class="s-input" data-f="driver">${driverOptions(c.driver)}</select>
+
+                    <input class="s-input mono" data-f="dsn" placeholder="${attr(DSN_HINTS[c.driver] || "cadena de conexión (DSN)")}" spellcheck="false" autocomplete="off" value="${attr(c.dsn)}" />
+
+                    <button type="button" data-act="test" title="Probar conexión">Probar</button>
+
+                    <button type="button" class="btn-danger s-x" data-act="del" title="Quitar">✕</button>
+
+                </div>`).join("");
+
+
+
+            // Gorilla WebSocket is a built-in dependency installed automatically
+            // for every server; keep it out of the user-managed dependencies list.
+            const depRows = d.dependencies
+                .map((dep, i) => ({ dep, i }))
+                .filter(({ dep }) => dep.path !== "github.com/gorilla/websocket")
+                .map(({ dep, i }) => `
+
+                <div class="s-row dep" data-kind="dependencies" data-i="${i}">
+
+                    <input class="s-input mono" data-f="path" placeholder="github.com/google/uuid" spellcheck="false" autocomplete="off" value="${attr(dep.path)}" />
+
+                    <input class="s-input mono" data-f="version" placeholder="latest" spellcheck="false" autocomplete="off" value="${attr(dep.version)}" />
+
+                    ${depBadge(srv, dep)}
+
+                    <button type="button" class="btn-danger s-x" data-act="del" title="Quitar">✕</button>
+
+                </div>`).join("");
+
+
+
+            const firstEnv = (d.env.find(e => e.key) || {}).key || "API_KEY";
+
+            const firstDb = (d.databases.find(c => c.name) || {}).name || "main";
+
+            const sample = `import (
+
+    "os"
+
+    "server-manager/sdk"
+
+)
+
+
+
+func Handler(w http.ResponseWriter, r *http.Request) {
+
+    token := os.Getenv("${firstEnv}")   // variable de entorno de este server
+
+    db, err := sdk.DB("${firstDb}")      // conexión configurada (*sql.DB)
+
+    sdk.Log("hola")                      // aparece en Logs en Vivo
+
+}`;
+
+
+
+            const canInstall = !st.dirty && d.dependencies.length > 0 && meta.go_available !== false;
+
+
+
+            return `
+
+                <div class="s-section">
+
+                    <div class="s-grid">
+
+                        <label class="s-field">Nombre
+
+                            <input class="s-input" data-g="name" value="${attr(d.name)}" />
+
+                        </label>
+
+                        <label class="s-field">Puerto
+
+                            <input class="s-input" type="number" min="1" max="65535" data-g="port" value="${attr(d.port)}" />
+
+                        </label>
+
+                    </div>
+
+                    <label class="s-check">
+
+                        <input type="checkbox" data-g="autostart" ${d.autostart ? "checked" : ""} />
+
+                        Iniciar automáticamente al abrir Server Manager
+
+                    </label>
+
+                </div>
+
+
+
+                <div class="s-section">
+
+                    <h4>Variables de entorno</h4>
+
+                    <p class="s-help">Las lee el handler con <code>os.Getenv("NOMBRE")</code>. Son propias de este server (no se ve el entorno real del sistema).</p>
+
+                    ${envRows}
+
+                    <button type="button" data-act="add-env">+ Variable</button>
+
+                </div>
+
+
+
+                <div class="s-section">
+
+                    <h4>Conexiones a bases de datos</h4>
+
+                    <p class="s-help">${(meta.drivers || []).length
+
+                    ? `Drivers disponibles: ${(meta.drivers || []).map(escapeHtml).join(", ")}. El handler obtiene el pool con <code>sdk.DB("nombre")</code>.`
+
+                    : `<span class="s-warn">No hay drivers de base de datos compilados en esta instalación.</span>`}</p>
+
+                    ${dbRows}
+
+                    <button type="button" data-act="add-db">+ Conexión</button>
+
+                </div>
+
+
+
+                <div class="s-section">
+
+                    <h4>Dependencias</h4>
+
+                    <p class="s-help">Paquetes Go de terceros que el handler puede importar (ruta del paquete y versión). Se descargan con el comando <code>go</code> y se interpretan desde el código fuente.
+
+                    ${meta.go_available === false ? `<br><span class="s-warn">No se encontró el comando <code>go</code> en el PATH: no se podrán instalar.</span>` : ""}</p>
+
+                    ${depRows}
+
+                    <div class="s-actions">
+
+                        <button type="button" data-act="add-dep">+ Dependencia</button>
+
+                        <button type="button" class="btn-success" data-act="install" ${canInstall ? "" : "disabled"}
+
+                            title="${st.dirty ? "Guardá la configuración primero" : "Descargar las dependencias"}">Instalar dependencias</button>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="s-section">
+
+                    <h4>Cómo usarlo en un handler</h4>
+
+                    <pre class="s-code"><code>${highlightGo(sample)}</code></pre>
+
+                </div>
+
+
+
+                <div class="s-section">
+
+                    <div class="s-actions">
+
+                        <button type="button" class="btn" data-act="save">Guardar configuración</button>
+
+                        <button type="button" data-act="reset">Descartar cambios</button>
+
+                    </div>
+
+                    <p class="s-help" style="margin-top:10px">Si el server está corriendo, cambiar el puerto, las variables o las conexiones lo reinicia automáticamente.</p>
+
+                </div>`;
+
+        }
+
+
+
+        function wireSettings(srv) {
+
+            const card = document.getElementById("settingsCard");
+
+            const body = document.getElementById("settingsBody");
+
+            if (!card || !body) return;
+
+            const st = settingsState(srv);
+
+
+
+            const redraw = () => { body.innerHTML = settingsBodyHtml(srv, st); };
+
+            const markDirty = () => {
+
+                st.dirty = true;
+
+                document.getElementById("settingsDirty").hidden = false;
+
+                const inst = body.querySelector('[data-act="install"]');
+
+                if (inst) { inst.disabled = true; inst.title = "Guardá la configuración primero"; }
+
+            };
+
+
+
+            card.addEventListener("toggle", () => { settingsOpen = card.open; });
+
+
+
+            body.addEventListener("input", (e) => {
+
+                const el = e.target;
+
+                if (el.dataset.g) {
+
+                    const key = el.dataset.g;
+
+                    st.data[key] = el.type === "checkbox" ? el.checked : (key === "port" ? Number(el.value) : el.value);
+
+                    markDirty();
+
+                    return;
+
+                }
+
+                const row = el.closest("[data-kind]");
+
+                if (row && el.dataset.f) {
+
+                    st.data[row.dataset.kind][Number(row.dataset.i)][el.dataset.f] = el.value;
+
+                    markDirty();
+
+                    if (row.dataset.kind === "databases" && el.dataset.f === "driver") redraw(); // cambia el ejemplo de DSN
+
+                }
+
+            });
+
+
+
+            body.addEventListener("click", (e) => {
+
+                const btn = e.target.closest("[data-act]");
+
+                if (!btn || btn.disabled) return;
+
+                const row = btn.closest("[data-kind]");
+
+
+
+                switch (btn.dataset.act) {
+
+                    case "add-env":
+
+                        st.data.env.push({ key: "", value: "" }); markDirty(); redraw(); break;
+
+                    case "add-db":
+
+                        st.data.databases.push({ name: "", driver: (meta.drivers || [])[0] || "", dsn: "" }); markDirty(); redraw(); break;
+
+                    case "add-dep":
+
+                        st.data.dependencies.push({ path: "", version: "" }); markDirty(); redraw(); break;
+
+                    case "del":
+
+                        st.data[row.dataset.kind].splice(Number(row.dataset.i), 1); markDirty(); redraw(); break;
+
+                    case "test": {
+
+                        const c = st.data.databases[Number(row.dataset.i)];
+
+                        sendMsg("test_db", srv.id, { name: c.name, driver: c.driver, dsn: c.dsn });
+
+                        toast(`Probando conexión ${c.name ? "«" + c.name + "»" : ""}…`);
+
+                        break;
+
+                    }
+
+                    case "install":
+
+                        sendMsg("install_deps", srv.id);
+
+                        toast("Instalando dependencias… puede tardar un momento (mirá los Logs en vivo)");
+
+                        break;
+
+                    case "reset":
+
+                        delete settingsDrafts[srv.id];
+
+                        renderServerDetails(srv);
+
+                        break;
+
+                    case "save": {
+
+                        const d = st.data;
+
+                        sendMsg("update_server", srv.id, {
+
+                            name: d.name,
+
+                            port: Number(d.port),
+
+                            autostart: !!d.autostart,
+
+                            env: d.env,
+
+                            databases: d.databases,
+
+                            dependencies: d.dependencies,
+
+                        });
+
+                        break;
+
+                    }
+
+                }
+
+            });
+
+        }
+
+
+
+        // ---------- Editor de código Go: resaltado + ayudas de edición ----------
+
+        function highlightGo(code) {
+
+            const canHighlight = window.Prism && Prism.languages && Prism.languages.go;
+
+            const html = canHighlight ? Prism.highlight(code, Prism.languages.go, "go") : escapeHtml(code);
+
+            // El salto de línea final evita que el <pre> pierda la última línea vacía
+
+            return html + "\n";
+
+        }
+
+
+
+        function editorInsert(ta, text) {
+
+            ta.focus();
+
+            // execCommand conserva el historial de deshacer (Ctrl+Z) del textarea
+
+            let ok = false;
+
+            try { ok = document.execCommand("insertText", false, text); } catch (_) { }
+
+            if (!ok) {
+
+                ta.setRangeText(text, ta.selectionStart, ta.selectionEnd, "end");
+
+                ta.dispatchEvent(new Event("input", { bubbles: true }));
+
+            }
+
+        }
+
+
+
+        function lineStartOf(v, pos) {
+
+            return pos === 0 ? 0 : v.lastIndexOf("\n", pos - 1) + 1;
+
+        }
+
+
+
+        function handleEditorKeys(e, ta) {
+
+            if (e.isComposing || e.ctrlKey || e.metaKey || e.altKey) return;
+
+            const v = ta.value;
+
+            const s = ta.selectionStart;
+
+            const end = ta.selectionEnd;
+
+
+
+            // Tab / Shift+Tab: indentar y desindentar (una o varias líneas)
+
+            if (e.key === "Tab") {
+
+                e.preventDefault();
+
+                if (s === end && !e.shiftKey) {
+
+                    editorInsert(ta, "\t");
+
+                    return;
+
+                }
+
+                const blockStart = lineStartOf(v, s);
+
+                const endRef = (end > s && v[end - 1] === "\n") ? end - 1 : end;
+
+                let blockEnd = v.indexOf("\n", endRef);
+
+                if (blockEnd === -1) blockEnd = v.length;
+
+
+
+                const lines = v.slice(blockStart, blockEnd).split("\n");
+
+                const out = lines.map(l => e.shiftKey ? l.replace(/^(\t| {1,4})/, "") : "\t" + l);
+
+
+
+                ta.setSelectionRange(blockStart, blockEnd);
+
+                editorInsert(ta, out.join("\n"));
+
+
+
+                if (s === end) {
+
+                    const delta = out[0].length - lines[0].length;
+
+                    const caret = Math.max(blockStart, s + delta);
+
+                    ta.setSelectionRange(caret, caret);
+
+                } else {
+
+                    ta.setSelectionRange(blockStart, blockStart + out.join("\n").length);
+
+                }
+
+                return;
+
+            }
+
+
+
+            // Enter: mantiene la indentación y agrega un nivel después de { ( [ o case/default:
+
+            if (e.key === "Enter" && !e.shiftKey) {
+
+                e.preventDefault();
+
+                const before = v.slice(lineStartOf(v, s), s);
+
+                const indent = before.match(/^[\t ]*/)[0];
+
+                const opens = /[{(**\\[**]\s*$/.test(before) || /^\s*(case\b.*|default)\s*:\s*$/.test(before);
+
+
+
+                if (s === end && v[s - 1] === "{" && v[s] === "}") {
+
+                    editorInsert(ta, "\n" + indent + "\t" + "\n" + indent);
+
+                    const caret = s + 1 + indent.length + 1;
+
+                    ta.setSelectionRange(caret, caret);
+
+                } else {
+
+                    editorInsert(ta, "\n" + indent + (opens ? "\t" : ""));
+
+                }
+
+                return;
+
+            }
+
+
+
+            // "}" en una línea que solo tiene indentación: quita un nivel
+
+            if (e.key === "}" && s === end) {
+
+                const before = v.slice(lineStartOf(v, s), s);
+
+                if (/^[\t ]+$/.test(before)) {
+
+                    e.preventDefault();
+
+                    const cut = before.endsWith("\t") ? 1 : Math.min(4, before.length);
+
+                    ta.setSelectionRange(s - cut, s);
+
+                    editorInsert(ta, "}");
+
+                }
+
+            }
+
+        }
+
+
+
+        function setupCodeEditor(ta) {
+
+            const pre = ta.parentElement.querySelector("pre.code-highlight");
+
+            const codeEl = pre.querySelector("code");
+
+
+
+            const render = () => { codeEl.innerHTML = highlightGo(ta.value); };
+
+            const syncScroll = () => {
+
+                pre.scrollTop = ta.scrollTop;
+
+                pre.scrollLeft = ta.scrollLeft;
+
+            };
+
+
+
+            ta.addEventListener("input", () => { render(); syncScroll(); });
+
+            ta.addEventListener("scroll", syncScroll);
+
+            ta.addEventListener("keydown", (e) => handleEditorKeys(e, ta));
+
+
+
+            render();
+
+        }
+
+
+
+        function escapeHtml(str) {
+
+            if (!str) return '';
+
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+        }
+
+
+
+        form.addEventListener("submit", (event) => {
+
+            event.preventDefault();
+
+            const formData = new FormData(form);
+
+            const server = {
+
+                name: formData.get("name").trim(),
+
+                proto: formData.get("proto"),
+
+                port: Number(formData.get("port")),
+
+            };
+
+
+
+            sendMsg("create_server", null, server);
+
+            form.reset();
+
+            dialog.close();
+
+        });
+
+
+
+        cancelButton.addEventListener("click", () => {
+
+            form.reset();
+
+            dialog.close();
+
+        });
+
+
+
+        document.getElementById("btnNewServer").addEventListener("click", () => dialog.showModal());
+
+    </script>
+
+</body>
+
+
+
+</html>

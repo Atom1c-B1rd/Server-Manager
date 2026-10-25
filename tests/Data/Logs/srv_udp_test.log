@@ -1,0 +1,4 @@
+[17:47:17] UDP server started on port 18084
+[17:47:17] Loaded custom UDP handler OnUDPData
+[17:47:18] UDP Received from 127.0.0.1:33808 [9 bytes]: Hello UDP
+[17:47:18] UDP server stopped

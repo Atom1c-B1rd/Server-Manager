@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Documentación · Server Manager</title>
+  <style>
+    :root{color-scheme:dark;--bg:#111318;--panel:#191c24;--border:#2c303b;--accent:#22d3ee;--muted:#a0a7b5;--text:#e5e7eb;--green:#10b981;--yellow:#f59e0b}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.7 "Segoe UI",sans-serif}
+    header{position:sticky;top:0;z-index:5;background:rgba(17,19,24,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:14px max(22px,calc((100% - 1120px)/2));display:flex;align-items:center;justify-content:space-between;gap:18px}
+    .brand{font-size:17px;font-weight:700;color:var(--accent);white-space:nowrap}.back{color:var(--accent);text-decoration:none;border:1px solid var(--border);border-radius:7px;padding:6px 10px;white-space:nowrap}.back:hover{border-color:var(--accent)}
+    .layout{max-width:1120px;margin:auto;padding:34px 22px 70px;display:grid;grid-template-columns:230px minmax(0,1fr);gap:30px}nav{align-self:start;position:sticky;top:82px;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px}nav strong{display:block;margin-bottom:8px}nav a{display:block;color:var(--muted);text-decoration:none;padding:4px 0;font-size:13px}nav a:hover{color:var(--accent)}main{min-width:0}h1{font-size:34px;line-height:1.2;margin:0 0 12px}h2{font-size:24px;line-height:1.3;margin:42px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border)}h3{font-size:17px;margin:22px 0 6px;color:#f3f4f6}p{margin:8px 0 14px}.intro{font-size:17px;color:#c8ced8}.muted{color:var(--muted)}.card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:17px 19px;margin:14px 0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.tag{display:inline-block;border:1px solid var(--border);border-radius:5px;padding:1px 7px;color:var(--accent);font-size:12px}code,pre{font-family:Consolas,"Cascadia Code",monospace}code{color:#a5f3fc;background:#0c1118;border-radius:4px;padding:2px 5px}pre{overflow:auto;background:#0c1118;border:1px solid var(--border);border-radius:8px;padding:14px;color:#d5e3f0;font-size:13px;line-height:1.55}ul,ol{padding-left:23px}li{margin:5px 0}.callout{border-left:3px solid var(--accent);padding:9px 13px;background:#151e25;border-radius:0 7px 7px 0;margin:14px 0}.warn{border-left-color:var(--yellow);background:#211d14}.ok{color:var(--green)}table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px}th,td{text-align:left;vertical-align:top;padding:9px;border-bottom:1px solid var(--border)}th{color:var(--accent)}footer{border-top:1px solid var(--border);margin-top:48px;padding-top:18px;color:var(--muted);font-size:13px}
+    @media(max-width:760px){.layout{grid-template-columns:1fr;padding-top:22px}nav{position:static}.grid{grid-template-columns:1fr}h1{font-size:28px}header{padding:12px 16px}}
+  </style>
+</head>
+<body>
+<header><div class="brand">Server Manager <span class="muted">/ Documentación</span></div><a class="back" href="/">← Volver a la aplicación</a></header>
+<div class="layout">
+<nav aria-label="Índice de documentación"><strong>En esta guía</strong>
+  <a href="#overview">Qué es</a><a href="#quickstart">Inicio rápido</a><a href="#lifecycle">Servidores y estados</a><a href="#http">HTTP</a><a href="#websocket">WebSocket</a><a href="#tcp">TCP</a><a href="#udp">UDP</a><a href="#handlers">Handlers y código</a><a href="#globals">Código global</a><a href="#settings">Ajustes avanzados</a><a href="#dispatch">Cómo se elige un handler</a><a href="#storage">Archivos y logs</a><a href="#troubleshooting">Problemas frecuentes</a>
+</nav>
+<main>
+  <h1>Documentación de Server Manager</h1>
+  <p class="intro">Guía de uso y referencia técnica para crear, configurar, ejecutar y entender los servidores que administra esta aplicación.</p>
+  <div class="callout">Server Manager es una aplicación local. La interfaz se abre en <code>http://localhost:3000</code>; los servidores que creás usan sus propios puertos.</div>
+
+  <section id="overview"><h2>1. Qué es y cómo está organizado</h2>
+    <p>Server Manager permite definir varios servidores en un solo proceso de administración. Cada servidor tiene un protocolo, puerto, handlers y configuración propios. La interfaz web se comunica con el proceso Go mediante WebSocket y envía operaciones para crear, editar, iniciar, detener y consultar servidores.</p>
+    <div class="grid"><div class="card"><h3>Interfaz (UI)</h3><p>Permite administrar los servidores, editar rutas y handlers, ver logs y guardar ajustes.</p></div><div class="card"><h3>Manager</h3><p>Coordina las instancias en ejecución, selecciona el motor según el protocolo y controla su ciclo de vida.</p></div><div class="card"><h3>Motores de protocolo</h3><p>Implementan HTTP, WebSocket, TCP y UDP. Cada motor recibe la configuración de su servidor.</p></div><div class="card"><h3>Runtime de handlers</h3><p>Evalúa código Go de usuario con Yaegi, un intérprete de Go, para cargar funciones definidas desde la interfaz.</p></div></div>
+    <p>El código de los handlers se interpreta en tiempo de ejecución; no se crea un ejecutable independiente por cada handler. Las dependencias externas que necesite un servidor se preparan antes de iniciarlo.</p>
+  </section>
+
+  <section id="quickstart"><h2>2. Inicio rápido</h2><ol>
+    <li>Pulsá <strong>Nuevo server</strong>.</li><li>Elegí un nombre, protocolo y puerto. El puerto debe estar libre y dentro del rango <code>1–65535</code>.</li><li>Guardá la configuración. El servidor guardado puede seguir detenido: guardar no equivale a iniciar.</li><li>Seleccioná el servidor en la lista lateral para abrir su panel de administración.</li><li>Configurá sus rutas (si corresponde) y handlers. Revisá el código inicial y adaptalo a tu protocolo.</li><li>Pulsá <strong>Iniciar</strong> y revisá el estado y los logs.</li><li>Probá el endpoint o conectá un cliente usando la dirección, puerto y formato de mensaje adecuados.</li></ol>
+    <div class="callout warn">El puerto <code>3000</code> está reservado para la propia interfaz de Server Manager; no lo uses para uno de los servidores administrados.</div>
+  </section>
+
+  <section id="lifecycle"><h2>3. Servidores y estados</h2><ul>
+    <li><strong>Crear:</strong> genera una configuración para el servidor.</li><li><strong>Guardar:</strong> persiste los cambios de configuración. Según el ajuste editado, puede ser necesario reiniciar el servidor para que el proceso activo use la nueva configuración.</li><li><strong>Iniciar:</strong> carga la configuración, prepara dependencias pendientes, crea el motor correspondiente y comienza a escuchar en el puerto configurado.</li><li><strong>Detener:</strong> detiene la instancia en ejecución; la configuración guardada no se elimina.</li><li><strong>Logs:</strong> muestran eventos de inicio y detención, conexiones, mensajes y errores que registre el motor.</li><li><strong>Inicio automático:</strong> si está activado, Server Manager intenta iniciar ese servidor cuando arranca la aplicación.</li></ul>
+    <p>Los servidores son independientes en su configuración y puerto. No pueden escuchar simultáneamente en la misma combinación de dirección, puerto y protocolo si el sistema operativo no permite compartirla.</p>
+  </section>
+
+  <section id="http"><h2>4. Servidor HTTP</h2><p>HTTP se usa para endpoints de petición/respuesta, por ejemplo una API REST. Cada handler HTTP se asocia a un método y una ruta.</p>
+    <table><thead><tr><th>Campo</th><th>Significado</th><th>Ejemplo</th></tr></thead><tbody><tr><td>Método</td><td>Método HTTP que activa el handler.</td><td><code>GET</code>, <code>POST</code></td></tr><tr><td>Ruta</td><td>Path de la petición.</td><td><code>/health</code>, <code>/users</code></td></tr><tr><td>Nombre</td><td>Identificador descriptivo del handler.</td><td><code>HealthCheck</code></td></tr><tr><td>Código</td><td>Función Go compatible con una de las firmas soportadas.</td><td>Ejemplo abajo</td></tr></tbody></table>
+    <p>Firmas aceptadas por el motor:</p><pre><code>func(c echo.Context) error
+
+func(w http.ResponseWriter, r *http.Request)</code></pre>
+    <p>Ejemplo de handler Echo para responder texto:</p><pre><code>func HealthCheck(c echo.Context) error {
+    return c.String(200, "ok")
+}</code></pre>
+    <p>El motor registra cada petición en los logs con método, ruta, código HTTP y latencia. Si no hay handlers configurados, el motor registra una respuesta básica en <code>/</code>.</p>
+  </section>
+
+  <section id="websocket"><h2>5. Servidor WebSocket</h2><p>En WebSocket hay dos conceptos distintos: <strong>rutas</strong> y <strong>handlers de mensajes</strong>.</p>
+    <div class="card"><h3>Rutas WebSocket</h3><p>Definen el path HTTP en el que se acepta el handshake y se establece la conexión. Ejemplos: <code>/chat</code> o <code>/game</code>. El cliente debe conectarse a la ruta correcta, por ejemplo <code>ws://localhost:8081/chat</code>.</p></div>
+    <div class="card"><h3>Handlers WebSocket</h3><p>Se eligen por el tipo del mensaje recibido y pueden asociarse a una ruta concreta. Así, el mismo tipo de mensaje puede manejarse de forma diferente en dos rutas distintas.</p></div>
+    <p>De forma predeterminada, el tipo del mensaje se obtiene del campo JSON <code>type</code> y el payload del campo <code>data</code>. El campo de tipo se puede cambiar en Formato de mensajes.</p>
+    <pre><code>{"type":"chat.send","data":{"text":"Hola"}}</code></pre>
+    <p>Firma esperada por los handlers WebSocket:</p><pre><code>func HandleChat(conn *websocket.Conn, msgType int, payload []byte) error</code></pre>
+    <p><code>conn</code> es la conexión activa; <code>msgType</code> es el tipo de frame WebSocket original y <code>payload</code> contiene los bytes del campo <code>data</code> cuando existe, o el mensaje completo si no se extrajo ese campo. La función también puede definirse sin valor de retorno.</p>
+    <p>Los logs del motor incluyen la ruta y su ID, el tipo de mensaje y su contenido cuando corresponde, además de los eventos de conexión y desconexión. Evitá enviar secretos en mensajes que queden registrados.</p>
+  </section>
+
+  <section id="tcp"><h2>6. Servidor TCP</h2><p>TCP es un flujo de bytes: no conserva límites de mensajes por sí solo. En esta implementación, cada mensaje debe terminar con un salto de línea (<code>\n</code>) y contener un objeto JSON.</p>
+    <pre><code>{"type":"login","data":{"username":"admin"}}</code></pre>
+    <p>El campo <code>type</code> identifica el handler y <code>data</code> se entrega como bytes JSON. Se puede configurar otro nombre de campo para el tipo.</p><pre><code>func HandleLogin(conn net.Conn, payload []byte) {
+    var input struct {
+        Username string `json:"username"`
+    }
+    if err := json.Unmarshal(payload, &input); err != nil {
+        return
+    }
+    // Procesar input y responder mediante conn.
+}</code></pre>
+    <p>El cliente debe agregar <code>\n</code> al final de cada mensaje JSON. El handler recibe la conexión TCP para poder responder al cliente.</p>
+  </section>
+
+  <section id="udp"><h2>7. Servidor UDP</h2><p>UDP trabaja con datagramas independientes y no garantiza entrega ni orden. El formato de este servidor es una cabecera de texto con el tipo, seguida de un salto de línea y el payload binario.</p>
+    <pre><code>login\n&lt;bytes del payload&gt;</code></pre>
+    <p>El texto anterior al primer <code>\n</code> se compara con el campo <strong>Path / tipo</strong> del handler. Todo lo que viene después se pasa como <code>[]byte</code>. UDP no interpreta el payload como JSON automáticamente.</p><pre><code>func HandlePacket(conn *net.UDPConn, addr *net.UDPAddr, payload []byte) {
+    // Procesar payload y, si corresponde, responder:
+    // conn.WriteToUDP(respuesta, addr)
+}</code></pre>
+    <p>El tamaño máximo teórico de un datagrama UDP es 65.507 bytes en IPv4, aunque en redes reales los datagramas grandes pueden fragmentarse o fallar. Preferí paquetes pequeños.</p>
+  </section>
+
+  <section id="handlers"><h2>8. Handlers y formato del código</h2><p>Un handler es una función Go que el motor carga y ejecuta cuando recibe una petición, conexión o mensaje que coincide con su configuración. El nombre de la función debe coincidir con la función que el runtime intenta resolver para ese handler.</p>
+    <ul><li><strong>Path / tipo:</strong> en HTTP es el path; en TCP, UDP y WebSocket representa el tipo del mensaje. En WebSocket la ruta de conexión se configura por separado.</li><li><strong>Código:</strong> contiene la función handler.</li><li><strong>Dependencias:</strong> paquetes externos requeridos por el código. Deben estar disponibles para el runtime antes de iniciar el servidor.</li><li><strong>Formato de mensajes:</strong> en TCP y WebSocket, el campo JSON usado para reconocer el tipo de mensaje; el valor inicial es <code>type</code>.</li></ul>
+    <p>Imports comunes como <code>encoding/json</code> y <code>fmt</code> forman parte del entorno inicial. El conjunto exacto de funciones y tipos disponibles depende del protocolo y de las dependencias configuradas. Para cada protocolo, respetá la firma documentada en su sección.</p>
+  </section>
+
+  <section id="globals"><h2>9. Código global del servidor</h2><p>El editor de código global está pensado para declaraciones compartidas por varios handlers del mismo servidor: tipos, funciones auxiliares y variables globales. Usalo para evitar repetir la misma lógica en cada handler.</p><pre><code>type LoginRequest struct {
+    Username string `json:"username"`
+}
+
+func isEmpty(value string) bool {
+    return strings.TrimSpace(value) == ""
+}</code></pre>
+    <p>El código global no sustituye la función de entrada de cada handler: cada handler necesita su propia función con la firma que requiere el motor. Mantené las declaraciones globales compatibles con el intérprete y con los imports disponibles.</p>
+  </section>
+
+  <section id="settings"><h2>10. Ajustes avanzados</h2>
+    <h3>Variables de entorno</h3><p>Permiten configurar valores que el código puede leer mediante <code>os.Getenv("NOMBRE")</code>. Son útiles para opciones de ejecución; no publiques sus valores en logs.</p>
+    <h3>Conexiones a bases de datos</h3><p>Configurá un nombre, un driver compilado en la aplicación y un DSN. Los handlers pueden usar la conexión mediante el SDK del proyecto, por ejemplo <code>sdk.DB("main")</code> si la conexión se llama <code>main</code>. El DSN puede contener credenciales; guardalo con cuidado.</p>
+    <h3>Dependencias externas</h3><p>Agregá el path del paquete Go y una versión. Server Manager intenta instalar/preparar las dependencias antes de arrancar. Si falla, revisá el mensaje de error y la conectividad con el repositorio del paquete.</p>
+    <h3>Inicio automático</h3><p>Activalo solo para los servidores que quieras que intenten arrancar cada vez que se inicia Server Manager.</p>
+  </section>
+
+  <section id="dispatch"><h2>11. Cómo se selecciona un handler</h2><ol><li>El motor recibe una petición o mensaje.</li><li>Extrae el método y la ruta en HTTP, o el tipo del mensaje en TCP, UDP y WebSocket.</li><li>Busca primero un handler con coincidencia exacta.</li><li>Si no hay coincidencia exacta, busca un handler de tipo <code>*</code>, que funciona como fallback.</li><li>Si no hay handler aplicable, TCP y UDP conservan una respuesta Echo predeterminada. El comportamiento de HTTP depende de las rutas registradas; WebSocket no ejecuta un handler de tipo que no coincida.</li></ol>
+    <div class="callout">En WebSocket, el handler debe coincidir tanto con el tipo de mensaje como con la ruta a la que pertenece. Un handler sin ruta asociada se trata como compatible con todas las rutas, para mantener compatibilidad con configuraciones antiguas.</div>
+  </section>
+
+  <section id="storage"><h2>12. Dónde guarda los datos</h2><table><thead><tr><th>Ubicación</th><th>Contenido</th></tr></thead><tbody><tr><td><code>Data/Server/</code></td><td>Configuración JSON de cada servidor.</td></tr><tr><td><code>Data/Logs/</code></td><td>Archivos de log por servidor.</td></tr><tr><td><code>Data/Deps/</code></td><td>Dependencias descargadas/preparadas para los handlers.</td></tr><tr><td><code>UI/UI.html</code></td><td>Interfaz de administración principal.</td></tr><tr><td><code>UI/DOCS.html</code></td><td>Esta documentación local.</td></tr><tr><td><code>Servers/</code></td><td>Motores HTTP, WebSocket, TCP y UDP.</td></tr><tr><td><code>Managers/</code></td><td>Ciclo de vida y administración de instancias.</td></tr><tr><td><code>Runtime/</code></td><td>Inicialización del intérprete y evaluación del código.</td></tr></tbody></table>
+    <p>Los archivos de configuración permiten conservar servidores entre reinicios. Los logs ayudan a diagnosticar el funcionamiento; no son una garantía de auditoría segura y pueden contener datos enviados por clientes.</p>
+  </section>
+
+  <section id="troubleshooting"><h2>13. Problemas frecuentes</h2>
+    <h3>El servidor no inicia</h3><ul><li>Comprobá que el puerto no esté ocupado y sea válido.</li><li>Revisá los logs del servidor y el error que devuelve la interfaz.</li><li>Verificá que el handler exista y use la firma correcta.</li><li>Si el error menciona una dependencia, revisá el path, versión y acceso a internet para instalarla.</li></ul>
+    <h3>El handler no se ejecuta</h3><ul><li>Confirmá el método y path para HTTP.</li><li>Para TCP, asegurate de enviar JSON completo terminado en <code>\n</code>.</li><li>Para WebSocket, verificá la URL de conexión, el ID de ruta elegido para el handler y el valor del campo de tipo.</li><li>Para UDP, enviá <code>tipo\n</code> seguido del payload; no envíes un objeto JSON esperando que se extraiga el tipo automáticamente.</li><li>Usá <code>*</code> como handler fallback cuando tenga sentido.</li></ul>
+    <h3>El servidor inicia pero el código no responde</h3><p>Revisá que la función tenga el nombre y la firma esperados, que valide el payload y que escriba la respuesta usando la conexión o el contexto recibido. Los handlers HTTP deben devolver un error o respuesta según su firma; los handlers TCP/WebSocket/UDP deben implementar explícitamente la respuesta cuando corresponda.</p>
+  </section>
+  <footer>Server Manager · Documentación de uso y arquitectura · <a href="/" style="color:var(--accent)">Volver a la interfaz</a></footer>
+</main>
+</div>
+</body>
+</html>
