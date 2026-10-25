@@ -89,8 +89,7 @@ Consultá `PROTOCOL_FORMATS.md` para ver los detalles de los formatos de protoco
 ├── tests/      # Pruebas
 ├── go.mod
 ├── go.sum
-├── main.go
-└── PROTOCOL_FORMATS.md
+└── main.go
 ```
 
 ## Datos locales
