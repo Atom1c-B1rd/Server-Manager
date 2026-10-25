@@ -1,0 +1,6 @@
+[10:29:43] [deps] Instalando 1 dependencia(s)...
+[10:29:45] [deps] go get: go: added github.com/gorilla/websocket v1.5.3
+[10:29:45] [deps] Dependencias instaladas
+[10:29:47] Error resolving WS handler HandleMessage: script global: declaración de import inválida: "os"
+[10:29:47] WebSocket server started on port 9000; routes=1; message type field="type"
+[10:29:53] WebSocket server stopped

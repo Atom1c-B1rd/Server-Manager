@@ -2257,16 +2257,9 @@
 
             const firstDb = (d.databases.find(c => c.name) || {}).name || "main";
 
-            const sample = `import (
+            const sample = `
 
-    "os"
-
-    "server-manager/sdk"
-
-)
-
-
-
+            
 func Handler(w http.ResponseWriter, r *http.Request) {
 
     token := os.Getenv("${firstEnv}")   // variable de entorno de este server

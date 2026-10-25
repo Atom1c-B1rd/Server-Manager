@@ -15,9 +15,9 @@ import (
 	"text/template"
 	"time"
 
-	"server-manager/Data"
-	"server-manager/Managers"
-	"server-manager/Runtime"
+	data "server-manager/Data"
+	managers "server-manager/Managers"
+	scriptrt "server-manager/Runtime"
 
 	"github.com/gorilla/websocket"
 )
@@ -456,7 +456,7 @@ func wsHandler(client *Client, msg Msg) {
 func defaultGlobalScript(proto string) string {
 	// Standard-library imports available by default to every newly created server.
 	// They are imported once in the generated global script, not in each handler.
-	imports := []string{`"encoding/json"`, `"fmt"`, `sdk "server-manager/sdk"`}
+	imports := []string{`"encoding/json"`, `"fmt"`, `"os"`, `sdk "server-manager/sdk"`}
 	switch proto {
 	case "http":
 		imports = append(imports, `"net/http"`)
