@@ -69,8 +69,6 @@ Los protocolos no comparten necesariamente el mismo formato de entrada. En térm
 - **WebSocket:** mensajes que pueden incluir un campo de tipo y un campo `data`; los handlers se pueden asociar a una ruta.
 - **HTTP:** solicitudes procesadas según la configuración del servidor y sus handlers.
 
-Consultá `PROTOCOL_FORMATS.md` para ver los detalles de los formatos de protocolo.
-
 ## Estructura del proyecto
 
 ```text
