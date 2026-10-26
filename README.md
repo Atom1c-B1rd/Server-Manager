@@ -109,7 +109,3 @@ No hace falta configurar una base de datos para iniciar la interfaz; las conexio
 ## Estado del proyecto
 
 Proyecto en desarrollo. La estructura y las funcionalidades pueden cambiar entre versiones.
-
-## Licencia
-
-Todavía no se especificó una licencia. Agregá un archivo `LICENSE` antes de distribuir el proyecto con condiciones de uso definidas.
