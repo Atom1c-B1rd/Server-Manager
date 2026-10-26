@@ -1,5 +1,5 @@
 {
-  "id": "srv_1793028412948106300",
+  "id": "srv_1793056458990058300",
   "name": "Test",
   "proto": "ws",
   "port": 9000,
@@ -21,7 +21,7 @@
   ],
   "message_type_field": "type",
   "global_script": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n\t\"github.com/gorilla/websocket\"\n\t\"os\"\n\tsdk \"server-manager/sdk\"\n)\n\n// SERVER_MANAGER_GLOBAL_DECLARATIONS",
-  "created_at": "2026-10-26T12:26:52-03:00",
+  "created_at": "2026-10-26T20:14:18-03:00",
   "dependencies": [
     {
       "path": "github.com/gorilla/websocket",

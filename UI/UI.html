@@ -1840,8 +1840,19 @@
                     row.dataset.routeSearch = String(route.path || "/").toLocaleLowerCase();
                     row.innerHTML = `<input id="routePath_${idx}" value="${escapeHtml(route.path || '/') }" placeholder="/chat" style="flex:1"/><button class="btn" id="routeSave_${idx}" type="button">Guardar</button><button class="btn-danger" id="routeDel_${idx}" type="button">Eliminar</button>`;
                     renderedRouteRows.push({ route, row });
-                    document.getElementById(`routeSave_${idx}`).onclick = () => sendMsg("save_route", srv.id, { id: route.id || ("r_" + Date.now()), path: document.getElementById(`routePath_${idx}`).value.trim() || "/" });
-                    document.getElementById(`routeDel_${idx}`).onclick = () => sendMsg("delete_route", srv.id, { route_id: route.id });
+                    // La fila todavía no está conectada al documento; buscar sus botones
+                    // con document.getElementById aquí devuelve null y rompe toda la UI WS.
+                    row.querySelector(`#routeSave_${idx}`).addEventListener("click", () => {
+                        const path = row.querySelector(`#routePath_${idx}`).value.trim() || "/";
+                        sendMsg("save_route", srv.id, { id: route.id || ("r_" + Date.now()), path });
+                    });
+                    row.querySelector(`#routeDel_${idx}`).addEventListener("click", () => {
+                        if (!route.id) {
+                            alert("Esta ruta todavía no tiene un ID guardado. Guardala primero.");
+                            return;
+                        }
+                        sendMsg("delete_route", srv.id, { route_id: route.id });
+                    });
                 });
                 const routeGroups = new Map();
                 renderedRouteRows.forEach(item => {
@@ -2075,7 +2086,7 @@
                     folder.dataset.folderKey = "handler:" + key;
                     folder.dataset.folderName = group.name.toLocaleLowerCase();
                     folder.open = true;
-                    folder.innerHTML = `<summary class="handler-folder-summary"><span> ${escapeHtml(group.name.toLocaleLowerCase())}</span><span class="handler-folder-count">${group.items.length} elementos</span></summary><div class="handler-folder-content"></div>`;
+                    folder.innerHTML = `<summary class="handler-folder-summary"><span>📁 ${escapeHtml(group.name.toLocaleLowerCase())}</span><span class="handler-folder-count">${group.items.length} elementos</span></summary><div class="handler-folder-content"></div>`;
                     const content = folder.querySelector(".handler-folder-content");
                     group.items.forEach(item => content.appendChild(item.card));
                     hList.appendChild(folder);

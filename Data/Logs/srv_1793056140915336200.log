@@ -1,0 +1,3 @@
+[20:09:00] [deps] Instalando 1 dependencia(s)...
+[20:09:02] [deps] go get: go: added github.com/gorilla/websocket v1.5.3
+[20:09:02] [deps] Dependencias instaladas

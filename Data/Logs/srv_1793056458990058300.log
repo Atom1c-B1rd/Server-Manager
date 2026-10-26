@@ -1,0 +1,6 @@
+[20:14:18] [deps] Instalando 1 dependencia(s)...
+[20:14:20] [deps] go get: go: added github.com/gorilla/websocket v1.5.3
+[20:14:20] [deps] Dependencias instaladas
+[20:14:22] Loaded WS message handler HandleMessage for type "*"
+[20:14:22] WebSocket server started on port 9000; routes=1; message type field="type"
+[20:14:24] WebSocket server stopped
